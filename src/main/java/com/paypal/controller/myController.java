@@ -47,6 +47,9 @@ private final PaymentService paymentService;
 	
 	String response =  paymentService.initiatePayment(tnxReference , initiatePaymentRequest);
 	  log.info("Payment initiated successfully with transaction reference: {}", "tnxReference");
+	  
+	 
+	  
 	  return "Payment initiated successfully" + tnxReference + response;
 	  
   }
