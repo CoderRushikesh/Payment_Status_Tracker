@@ -28,8 +28,8 @@ public class PPCreateOrderHelper {
 		
 		PPCreateOrderReq ppCreateOrderRequest = new PPCreateOrderReq();
 		ppCreateOrderRequest.setAmount(1.5);
-		ppCreateOrderRequest.setCurrency("USD");
-		ppCreateOrderRequest.setReturnUrl(initiatePaymentRequest.getSuccssUrl());
+		ppCreateOrderRequest.setCurrencyCode("USD");
+		ppCreateOrderRequest.setReturnUrl(initiatePaymentRequest.getSuccessUrl());
 		ppCreateOrderRequest.setCancelUrl(initiatePaymentRequest.getCancelUrl());
 
 		
@@ -37,7 +37,7 @@ public class PPCreateOrderHelper {
 		
 		HttpRequest httpRequest = new HttpRequest();
 		httpRequest.setHttpMethod(HttpMethod.POST);
-		httpRequest.setUrl("https://api.sandbox.paypal.com/v2/checkout/orders");
+		httpRequest.setUrl("http://localhost:8083/Payments");
 		
 		httpRequest.setHttpHeaders(headers);
 		httpRequest.setBody(requestAsJson);

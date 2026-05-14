@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class InitiatePaymentRequest {
 
-	private String succssUrl;
+	private String successUrl;
 	private String cancelUrl;
 	
 	

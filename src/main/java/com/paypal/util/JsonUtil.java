@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class JsonUtil {
- private ObjectMapper mapper = new ObjectMapper();
+
 
  private final ObjectMapper objectMapper;
 

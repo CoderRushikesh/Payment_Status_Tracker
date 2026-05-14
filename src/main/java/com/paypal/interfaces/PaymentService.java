@@ -1,4 +1,4 @@
-package com.paypal.service;
+package com.paypal.interfaces;
 
 import com.paypal.pojo.CreatePaymentRequest;
 import com.paypal.pojo.InitiatePaymentRequest;
