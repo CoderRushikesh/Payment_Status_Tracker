@@ -1,7 +1,9 @@
 package com.paypal.interfaces;
 
+import com.paypal.dto.TransactionDto;
+
 public interface TransactionStatusProcessor {
 
-	public String processStatus(String statusId);
+	public TransactionDto processStatus(TransactionDto tnxDto);
 	
 }

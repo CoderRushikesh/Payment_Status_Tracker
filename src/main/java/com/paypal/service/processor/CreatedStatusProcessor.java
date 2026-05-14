@@ -2,6 +2,7 @@ package com.paypal.service.processor;
 
 import org.springframework.stereotype.Service;
 
+import com.paypal.dto.TransactionDto;
 import com.paypal.interfaces.TransactionStatusProcessor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,11 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CreatedStatusProcessor implements TransactionStatusProcessor {
 
-	public String processStatus(String statusId) {
+	public TransactionDto processStatus( TransactionDto txnDto) {
 		// TODO Auto-generated method stub
 		
 		
-		return  statusId;
+		return  txnDto;
 	}
 
 	

@@ -1,13 +1,15 @@
 package com.paypal.service;
 
-import org.springframework.http.ResponseEntity;
+import java.util.UUID;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.paypal.dto.TransactionDto;
 import com.paypal.http.HttpRequest;
 import com.paypal.http.HttpServiceEngine;
 import com.paypal.interfaces.PaymentService;
-import com.paypal.interfaces.TransactionStatusProcessor;
 import com.paypal.pojo.CreatePaymentRequest;
 import com.paypal.pojo.InitiatePaymentRequest;
 import com.paypal.service.helper.PPCreateOrderHelper;
@@ -23,16 +25,28 @@ public class paymentServiceImpl implements PaymentService {
 	private final PPCreateOrderHelper ppCreateOrderHelper;
 	private final HttpServiceEngine httpServiceEngine;
 	private final PaymentStatusService paymentStatusService;
-	
+	private final ModelMapper modelMapper;
+
+
 	public String createPayment(@RequestBody CreatePaymentRequest createPaymentRequest) {
 		// TODO Auto-generated method stub
 		log.info("Creating payment with amount: "
 				+ " {} and currency: {} ");
+
+		TransactionDto txnDto = modelMapper.map(createPaymentRequest, TransactionDto.class);
+//		TransactionDto transactionDto = new TransactionDto();
+		log.info("Mapped CreatePaymentRequest to TransactionDto: {}", txnDto);
+
+        int txnStatusId = 1;
+        String txnReference = UUID.randomUUID().toString();
+        
+        txnDto.setTxnStatusId(txnStatusId);
+        txnDto.setTxnReference(txnReference);
 		
-		 String response = paymentStatusService.processPayment(1);
-		
-		log.info("Transaction status processed with response: {}", response);
-		return "Payment created successfully" + createPaymentRequest + "\n" + response;
+		String response = paymentStatusService.processPayment(txnDto);
+
+		log.info("Transaction status processed with response: {}", response );
+		return "Payment created successfully" + createPaymentRequest + "\n" + response + " \n" + txnDto;
 	}
 
 	@Override
@@ -41,21 +55,21 @@ public class paymentServiceImpl implements PaymentService {
 		log.info("Initiating payment with "
 				+ "transaction reference: {}", 
 				"tnxReference");
-		
-		 // make api call to paypal-provider to initiate payment 
-		  
-		  /*
-		   *  1 Prepare HttpRequest DONE
-		   *  2 Pass to HttpServiceEngine
-		   *  3 Process the response 
-		   * 
-		   */
+
+		// make api call to paypal-provider to initiate payment 
+
+		/*
+		 *  1 Prepare HttpRequest DONE
+		 *  2 Pass to HttpServiceEngine
+		 *  3 Process the response 
+		 * 
+		 */
 		HttpRequest  httpReq =	 ppCreateOrderHelper.prepareHttpRequest(tnxReference, initiatePaymentRequest);	
-	 log.info("Prepared HTTP request for initiating payment: {}", httpReq);	
-		
-//	ResponseEntity<String> httpResponse = httpServiceEngine.makeHttpCall(httpReq);
-//	 log.info("Received HTTP response for initiating payment: {}", httpResponse);
-	 
+		log.info("Prepared HTTP request for initiating payment: {}", httpReq);	
+
+		//	ResponseEntity<String> httpResponse = httpServiceEngine.makeHttpCall(httpReq);
+		//	 log.info("Received HTTP response for initiating payment: {}", httpResponse);
+
 		return  "Payment initiated successfully with transaction reference: " + tnxReference + " and response: " ;
 	}
 
@@ -68,6 +82,6 @@ public class paymentServiceImpl implements PaymentService {
 		return tnxReference;
 	}
 
-	
+
 
 }

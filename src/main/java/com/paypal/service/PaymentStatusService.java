@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.paypal.constant.ErrorCodeEnum;
+import com.paypal.dto.TransactionDto;
 import com.paypal.exception.ProcessingServiceException;
 import com.paypal.interfaces.TransactionStatusProcessor;
 import com.paypal.service.factory.PaymentStatusFactory;
@@ -17,12 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentStatusService {
  
 	private final PaymentStatusFactory paymentStatusFactory;
-	private TransactionStatusProcessor processor;
 	
-	 public String processPayment(int statusId) {
+	
+	 public String processPayment(TransactionDto txnDto) {
 		 
-		 log.info("Processing payment status for statusId : {}" , statusId);
-		 processor = paymentStatusFactory.getStatusProcessor(statusId);
+		 log.info("Processing payment status for txnDto : {}" , txnDto);
+		 int statusId = txnDto.getTxnStatusId();
+		 TransactionStatusProcessor	 processor = paymentStatusFactory.getStatusProcessor(statusId);
 	    
 		 if(processor == null) {
 			 
@@ -31,10 +33,10 @@ public class PaymentStatusService {
 			 
 		 }
 		 
-	   String response = processor.processStatus(statusId + " ");
+	   TransactionDto response = processor.processStatus(txnDto);
 	   log.info("Processed payment status for statusId : {} with response: {}", statusId, response);
 	 
-	  return response;
+	  return response.toString();
 	 }
 	
 	
