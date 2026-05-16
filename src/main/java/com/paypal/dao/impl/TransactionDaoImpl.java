@@ -1,5 +1,10 @@
 package com.paypal.dao.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -38,5 +43,28 @@ public class TransactionDaoImpl implements TransactionDao {
         transaction.setId(keyHolder.getKey().intValue());
         return transaction;
 	}
+	@Override
+	public TransactionEntity getTransactionById(String txnReferenc) {
+		
+		String sql = " SELECT * FROM `Transactions` WHERE txnReference = :txnReference lIMIT 1";
+		
+		 Map<String, Object> params = new HashMap<>();
+		 
+		 params.put("txnReference",txnReferenc);
+		
+		 
+     
+    	TransactionEntity txnEntity =jdbcTemplate.queryForObject(
+    		  sql,
+    		  params,
+    		  new BeanPropertyRowMapper<>(TransactionEntity.class)
+    			 
+    			 );
+     
+   
+    	return txnEntity;
+		
+	}
 
+	
 }

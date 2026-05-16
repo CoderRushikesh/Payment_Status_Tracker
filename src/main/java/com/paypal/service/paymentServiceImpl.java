@@ -6,7 +6,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.paypal.dao.interfaces.TransactionDao;
 import com.paypal.dto.TransactionDto;
+import com.paypal.entity.TransactionEntity;
 import com.paypal.http.HttpRequest;
 import com.paypal.http.HttpServiceEngine;
 import com.paypal.interfaces.PaymentService;
@@ -26,7 +28,7 @@ public class paymentServiceImpl implements PaymentService {
 	private final HttpServiceEngine httpServiceEngine;
 	private final PaymentStatusService paymentStatusService;
 	private final ModelMapper modelMapper;
-
+    private final TransactionDao transactionDao;
 
 	public String createPayment(@RequestBody CreatePaymentRequest createPaymentRequest) {
 		// TODO Auto-generated method stub
@@ -56,6 +58,12 @@ public class paymentServiceImpl implements PaymentService {
 				+ "transaction reference: {}", 
 				"tnxReference");
 
+		
+		TransactionEntity	txnEntity = transactionDao.getTransactionById(tnxReference);
+	    log.info("Fetched TransactionEntity from DB: {}", txnEntity);
+			
+	    TransactionDto txnDto = modelMapper.map(txnEntity, TransactionDto.class);
+	    
 		// make api call to paypal-provider to initiate payment 
 
 		/*
@@ -64,11 +72,12 @@ public class paymentServiceImpl implements PaymentService {
 		 *  3 Process the response 
 		 * 
 		 */
-		HttpRequest  httpReq =	 ppCreateOrderHelper.prepareHttpRequest(tnxReference, initiatePaymentRequest);	
+	
+		HttpRequest  httpReq =	 ppCreateOrderHelper.prepareHttpRequest(tnxReference, initiatePaymentRequest , txnDto);	
 		log.info("Prepared HTTP request for initiating payment: {}", httpReq);	
 
 		//	ResponseEntity<String> httpResponse = httpServiceEngine.makeHttpCall(httpReq);
-		//	 log.info("Received HTTP response for initiating payment: {}", httpResponse);
+		
 
 		return  "Payment initiated successfully with transaction reference: " + tnxReference + " and response: " ;
 	}
@@ -80,7 +89,11 @@ public class paymentServiceImpl implements PaymentService {
 				+ " transaction reference: {}", 
 				"tnxReference");
 		return tnxReference;
+		
+		
+		
 	}
+
 
 
 

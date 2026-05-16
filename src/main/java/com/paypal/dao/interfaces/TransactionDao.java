@@ -6,6 +6,6 @@ public interface TransactionDao {
 
 	
 	public TransactionEntity createTransaction(TransactionEntity transaction );
-	
+	TransactionEntity getTransactionById(String txnReferenc);
 	
 }
