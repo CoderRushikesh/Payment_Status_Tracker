@@ -3,6 +3,7 @@ package com.paypal.service;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -12,8 +13,10 @@ import com.paypal.entity.TransactionEntity;
 import com.paypal.http.HttpRequest;
 import com.paypal.http.HttpServiceEngine;
 import com.paypal.interfaces.PaymentService;
+import com.paypal.paypalprovider.PPOrderResponse;
 import com.paypal.pojo.CreatePaymentRequest;
 import com.paypal.pojo.InitiatePaymentRequest;
+import com.paypal.pojo.PaymentResponse;
 import com.paypal.service.helper.PPCreateOrderHelper;
 
 import lombok.RequiredArgsConstructor;
@@ -52,7 +55,7 @@ public class paymentServiceImpl implements PaymentService {
 	}
 
 	@Override
-	public String initiatePayment(String tnxReference , InitiatePaymentRequest initiatePaymentRequest) {
+	public PaymentResponse initiatePayment(String tnxReference , InitiatePaymentRequest initiatePaymentRequest) {
 		// TODO Auto-generated method stub
 		log.info("Initiating payment with "
 				+ "transaction reference: {}", 
@@ -76,10 +79,26 @@ public class paymentServiceImpl implements PaymentService {
 		HttpRequest  httpReq =	 ppCreateOrderHelper.prepareHttpRequest(tnxReference, initiatePaymentRequest , txnDto);	
 		log.info("Prepared HTTP request for initiating payment: {}", httpReq);	
 
-		//	ResponseEntity<String> httpResponse = httpServiceEngine.makeHttpCall(httpReq);
+		ResponseEntity<String> httpResponse = httpServiceEngine.makeHttpCall(httpReq);
+		log.info("Received HTTP response from PayPal provider: {}", httpResponse);
 		
+  PPOrderResponse ppOrderResponse =   ppCreateOrderHelper.processResponse(httpResponse);		
+  log.info("Processed PayPal provider response: {}", ppOrderResponse);
 
-		return  "Payment initiated successfully with transaction reference: " + tnxReference + " and response: " ;
+    PaymentResponse paymentResponse = new PaymentResponse();
+  
+    paymentResponse.setTxnReference(txnDto.getTxnReference());
+    paymentResponse.setTxnStatusId(txnDto.getTxnStatusId()); // Assuming 2 means initiated
+    
+    paymentResponse.setRedirectUrl(ppOrderResponse.getRedirectUrl()); 
+     paymentResponse.setProviderReference(ppOrderResponse.getOrderId());
+	 
+     
+     log.info("Constructing PaymentResponse with transaction reference: {}, status ID: {}, redirect URL: {}, provider reference: {}",
+			 paymentResponse.getTxnReference(), paymentResponse.getTxnStatusId(), paymentResponse.getRedirectUrl(), paymentResponse.getProviderReference());
+	 log.info("Constructed PaymentResponse: {}", paymentResponse);
+    
+		return  paymentResponse;
 	}
 
 	@Override

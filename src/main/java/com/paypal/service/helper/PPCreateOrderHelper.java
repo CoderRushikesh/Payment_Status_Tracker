@@ -1,13 +1,17 @@
 package com.paypal.service.helper;
 
 import org.springframework.http.HttpHeaders;
+
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.paypal.dto.TransactionDto;
 import com.paypal.http.HttpRequest;
 import com.paypal.paypalprovider.PPCreateOrderReq;
+import com.paypal.paypalprovider.PPOrderResponse;
 import com.paypal.pojo.InitiatePaymentRequest;
 import com.paypal.util.JsonUtil;
 
@@ -54,8 +58,33 @@ public class PPCreateOrderHelper {
 		
 	}
 
+	public PPOrderResponse processResponse(ResponseEntity<String> httpResponse) {
+	
+		log.info("Processing HTTP response from PayPal order creation with status code: {} and body: {}", httpResponse.getStatusCode(), httpResponse.getBody());
+	
+		if(httpResponse.getStatusCode().equals(HttpStatus.OK)) {
+			log.info("PayPal order created successfully with response: {}",
+					httpResponse.getBody());}
+			
+	PPOrderResponse responseObj	=	jsonUtil.fromJson(httpResponse.getBody(), PPOrderResponse.class);
+			// Further processing can be done here, such as updating transaction status in DB
+	   
+	if(responseObj != null && responseObj.getPaypalStatus()
+			!= null && responseObj.getOrderId() != null
+			&& responseObj.getRedirectUrl() != null) {
+	 
+	   log.info("Extracted OrderId: {}, PaypalStatus: {}, RedirectUrl: {} from PayPal response {} ", responseObj);
+		} 
+	else {
+			log.error("Failed to extract valid response from PayPal order creation. Response body: {}", httpResponse.getBody());
+		}
+	return responseObj;
+		
+		
 	
 	
+	}
+			
 	
 	
 }

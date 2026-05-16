@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.paypal.interfaces.PaymentService;
 import com.paypal.pojo.CreatePaymentRequest;
 import com.paypal.pojo.InitiatePaymentRequest;
+import com.paypal.pojo.PaymentResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +41,15 @@ private final PaymentService paymentService;
 //
 //	 }
   @PostMapping("/{tnxReference}/initiate")
-  public String initiatePayment(@PathVariable String tnxReference , @RequestBody InitiatePaymentRequest initiatePaymentRequest) {
+  public PaymentResponse initiatePayment(@PathVariable String tnxReference , @RequestBody InitiatePaymentRequest initiatePaymentRequest) {
 	  log.info("Initiating payment with transaction reference: {}", "tnxReference");
 	
-	String response =  paymentService.initiatePayment(tnxReference , initiatePaymentRequest);
+	  PaymentResponse response =  paymentService.initiatePayment(tnxReference , initiatePaymentRequest);
 	  log.info("Payment initiated successfully with transaction reference: {}", "tnxReference");
 	  
 	 
 	  
-	  return "Payment initiated successfully" + tnxReference + response;
+	  return response;
 	  
   }
   
