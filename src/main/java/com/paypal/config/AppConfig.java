@@ -30,7 +30,7 @@ public class AppConfig {
 				new HttpComponentsClientHttpRequestFactory(httpClient);
 		requestFactory.setConnectionRequestTimeout(10000); // 10 seconds - time to get connection from pool
 		requestFactory.setConnectTimeout(10000);  // 10 seconds - time to establish TCP connection
-		requestFactory.setReadTimeout(15000);     // 15 seconds - time waiting for server response
+		requestFactory.setConnectTimeout(15000);     // 15 seconds - time waiting for server response
 		
 		return builder
 				.requestFactory(requestFactory)
