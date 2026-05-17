@@ -1,16 +1,17 @@
 package com.paypal.service.helper;
 
 import org.springframework.http.HttpHeaders;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import com.paypal.constant.ErrorCodeEnum;
 import com.paypal.dto.TransactionDto;
+import com.paypal.exception.ProcessingServiceException;
 import com.paypal.http.HttpRequest;
 import com.paypal.paypalprovider.PPCreateOrderReq;
+import com.paypal.paypalprovider.PPErrorResponse;
 import com.paypal.paypalprovider.PPOrderResponse;
 import com.paypal.pojo.InitiatePaymentRequest;
 import com.paypal.util.JsonUtil;
@@ -78,11 +79,32 @@ public class PPCreateOrderHelper {
 	else {
 			log.error("Failed to extract valid response from PayPal order creation. Response body: {}", httpResponse.getBody());
 		}
+	
+	
+	
+	if(httpResponse.getStatusCode().is4xxClientError() || httpResponse.getStatusCode().is5xxServerError()) {
+		log.error("Error response received from PayPal order creation. Status code: {}, Response body: {}", httpResponse.getStatusCode(), httpResponse.getBody());
+		
+PPErrorResponse errorResponse =	jsonUtil.fromJson(httpResponse.getBody(), PPErrorResponse.class);
+		
+	throw new ProcessingServiceException(
+              errorResponse.getErrorCode(),
+			  errorResponse.getErrorMessage(),
+	          HttpStatus.valueOf(httpResponse.getStatusCode().value()));
+	}
+	
+	
+	
+	log.error("Unexpected response received from PayPal order creation. Status code: {}, Response body: {}", httpResponse.getStatusCode(), httpResponse.getBody());
+	
+	
+	
+			  
+	
+	
 	return responseObj;
 		
 		
-	
-	
 	}
 			
 	
