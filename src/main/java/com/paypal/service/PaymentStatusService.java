@@ -20,7 +20,7 @@ public class PaymentStatusService {
 	private final PaymentStatusFactory paymentStatusFactory;
 	
 	
-	 public String processPayment(TransactionDto txnDto) {
+	 public TransactionDto processPayment(TransactionDto txnDto) {
 		 
 		 log.info("Processing payment status for txnDto : {}" , txnDto);
 		 int statusId = txnDto.getTxnStatusId();
@@ -36,7 +36,7 @@ public class PaymentStatusService {
 	   TransactionDto response = processor.processStatus(txnDto);
 	   log.info("Processed payment status for statusId : {} with response: {}", statusId, response);
 	 
-	  return response.toString();
+	  return response;
 	 }
 	
 	

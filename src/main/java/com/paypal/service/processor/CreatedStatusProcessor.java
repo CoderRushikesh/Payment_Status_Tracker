@@ -13,25 +13,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class CreatedStatusProcessor implements TransactionStatusProcessor {
-
+	
 	private final ModelMapper modelMapper;
-    private final TransactionDao transactionDao;
 	
-	public TransactionDto processStatus( TransactionDto txnDto) {
-		// TODO Auto-generated method stub
+	private final TransactionDao transactionDao;
+
+	@Override
+	public TransactionDto processStatus(TransactionDto txnDto) {
+		log.info("Processing 'CREATED' status for txnDto: {}", txnDto);
 		
-		log.info("Processing Created status for transaction: {}", txnDto);
+		TransactionEntity txnEntity = modelMapper.map(txnDto, TransactionEntity.class);
+		log.info("Mapped TransactionEntity: {}", txnEntity);
 		
-	TransactionEntity txnEntity =	modelMapper.map(txnDto, TransactionEntity.class);
-	 log.info("Mapped TransactionEntity: {}", txnEntity);
-	
-	TransactionEntity responseEntity = transactionDao.createTransaction(txnEntity);
-	 log.info("Transaction created in DB: {}", responseEntity);	
-	return  txnDto;
+		TransactionEntity responseEntity = transactionDao.createTransaction(txnEntity);
+		log.info("Created TransactionEntity in DB: {}", responseEntity);
+		
+		txnDto.setId(responseEntity.getId());
+		
+		log.info("Updated TransactionDto with ID: {}", txnDto);
+		return txnDto;
 	}
 
-	
-
-	
-
 }
+
+	
+

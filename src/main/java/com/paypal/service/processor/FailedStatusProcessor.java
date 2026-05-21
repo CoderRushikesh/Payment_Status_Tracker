@@ -1,20 +1,36 @@
 package com.paypal.service.processor;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.paypal.dao.interfaces.TransactionDao;
 import com.paypal.dto.TransactionDto;
+import com.paypal.entity.TransactionEntity;
 import com.paypal.interfaces.TransactionStatusProcessor;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service 
+@Service
 @Slf4j
+@RequiredArgsConstructor
 public class FailedStatusProcessor implements TransactionStatusProcessor {
+
+	private final TransactionDao transactionDao;
+
+	private final ModelMapper modelMapper;
 
 	@Override
 	public TransactionDto processStatus(TransactionDto txnDto) {
-		// TODO Auto-generated method stub
-		log.info("Processing Failed status for transaction: {}", txnDto);
+		log.info("Processing 'FAILED' status for txnDto: {}", txnDto);
+
+		// convert DTO to Entity
+		TransactionEntity txnEntity = modelMapper.map(
+				txnDto, TransactionEntity.class);
+
+		transactionDao.updateTransaction(txnEntity);
+		log.info("Updated TransactionEntity in DB for FAILED status: {}", txnEntity);
+
 		return txnDto;
 	}
 

@@ -2,9 +2,15 @@ package com.paypal.http;
 
 
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
+
+import com.paypal.constant.ErrorCodeEnum;
+import com.paypal.exception.ProcessingServiceException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +40,35 @@ public class HttpServiceEngine {
 			log.info("HTTP call completed httpResponse:{}", httpResponse);
 
 			return httpResponse;
-		} catch (Exception e) { 
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			// valid error response from server
+			log.error("HTTP error response received: {}", e.getMessage(), e);
+			
+			// if the error is gateway time or service unavailable, throw PaypalProviderException
+			if (e.getStatusCode() == HttpStatus.GATEWAY_TIMEOUT ||
+					e.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+				log.error("Service is unavailable or gateway timed out");
+				throw new ProcessingServiceException(
+						ErrorCodeEnum.PAYPAL_PROVIDER_SERVICE_UNAVAILABLE.getErrorCode(),
+						ErrorCodeEnum.PAYPAL_PROVIDER_SERVICE_UNAVAILABLE.getErrorMessage(),
+						HttpStatus.SERVICE_UNAVAILABLE);
+			}
+			
+			// return ResponseEntity with error details 
+			String errorResponse = e.getResponseBodyAsString();
+			log.info("Error response body: {}", errorResponse);
+			
+			return ResponseEntity
+					.status(e.getStatusCode())
+					.body(errorResponse);
+			
+		} catch (Exception e) { // No Response case.
 			log.error("Exception while preparing form data: {}", e.getMessage(), e);
 
-			throw new RuntimeException("HTTP call failed in HttpServiceEngine"
-					+ ": " + e.getMessage());
+			throw new ProcessingServiceException(
+					ErrorCodeEnum.PAYPAL_PROVIDER_SERVICE_UNAVAILABLE.getErrorCode(),
+					ErrorCodeEnum.PAYPAL_PROVIDER_SERVICE_UNAVAILABLE.getErrorMessage(),
+					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 	}
 }
