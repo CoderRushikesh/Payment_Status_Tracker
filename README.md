@@ -76,7 +76,7 @@ Payment_Status_Tracker/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/CoderRushikesh/Payment_Status_Tracker.git
+git clone https://github.com/CoderRushikesh/paypal-payment-microservice.git
 cd Payment_Status_Tracker
 ```
 
