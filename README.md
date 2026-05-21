@@ -1,4 +1,4 @@
-# 💳 Payment Status Tracker
+# 💳 paypal-payment-microservice 
 
 A production-ready **Spring Boot REST API** for end-to-end PayPal payment lifecycle management — from order creation to capture — with full payment status tracking, persistent transaction records, and a clean 3-step API flow.
 
